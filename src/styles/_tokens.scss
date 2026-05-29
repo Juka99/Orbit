@@ -1,0 +1,26 @@
+$color-bg: #f4efe6;
+$color-bg-strong: #e8dcc8;
+$color-panel: rgba(255, 251, 245, 0.78);
+$color-panel-strong: #fffaf4;
+$color-line: rgba(89, 58, 28, 0.12);
+$color-text: #342515;
+$color-muted: #6d5b49;
+$color-accent: #0d7a66;
+$color-accent-strong: #22a189;
+$color-accent-soft: rgba(13, 122, 102, 0.12);
+$color-white: #fffaf4;
+
+$radius-lg: 28px;
+$radius-md: 18px;
+$radius-sm: 12px;
+
+$shadow-soft: 0 24px 70px rgba(61, 39, 17, 0.1);
+
+$font-sans: 'Avenir Next', 'Segoe UI Variable', 'Trebuchet MS', sans-serif;
+$font-heading: 'Avenir Next Condensed', 'Franklin Gothic Medium', 'Arial Narrow', sans-serif;
+$font-mono: 'Cascadia Code', 'Consolas', monospace;
+
+$breakpoints: (
+  'sm': 720px,
+  'lg': 1100px,
+);
