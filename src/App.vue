@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+  import {RouterLink, RouterView, useRoute} from 'vue-router';
 
-const route = useRoute()
+  // Comment for first commit
+  const route = useRoute();
 
-const navigationItems = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/notes', label: 'Notes' },
-  { to: '/water', label: 'Water' },
-  { to: '/calories', label: 'Calories' },
-]
+  const navigationItems = [
+    {to: '/', label: 'Dashboard'},
+    {to: '/notes', label: 'Notes'},
+    {to: '/water', label: 'Water'},
+    {to: '/calories', label: 'Calories'},
+  ];
 </script>
 
 <template>
@@ -28,7 +29,7 @@ const navigationItems = [
           :key="item.to"
           :to="item.to"
           class="nav__link"
-          :class="{ 'nav__link--active': route.path === item.to }"
+          :class="{'nav__link--active': route.path === item.to}"
         >
           {{ item.label }}
         </RouterLink>
@@ -52,114 +53,118 @@ const navigationItems = [
 </template>
 
 <style scoped lang="scss">
-.app-shell {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  gap: 24px;
-  padding: 24px;
+  .app-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 24px;
+    padding: 24px;
 
-  @include down('lg') {
-    grid-template-columns: 1fr;
+    @include down('lg') {
+      grid-template-columns: 1fr;
+    }
+
+    @include down('sm') {
+      padding: 14px;
+      gap: 14px;
+    }
   }
 
-  @include down('sm') {
-    padding: 14px;
+  .sidebar,
+  .main-content {
+    @include glass-panel;
+  }
+
+  .sidebar {
+    border-radius: $radius-lg;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    @include down('sm') {
+      padding: 18px;
+      border-radius: 24px;
+    }
+  }
+
+  .main-content {
+    border-radius: 36px;
+    padding: 32px;
+
+    @include down('sm') {
+      padding: 18px;
+      border-radius: 24px;
+    }
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
     gap: 14px;
+
+    strong {
+      display: block;
+      font-family: $font-heading;
+      font-size: 1.8rem;
+      letter-spacing: -0.03em;
+    }
+
+    p {
+      margin: 0;
+      color: $color-muted;
+    }
   }
-}
 
-.sidebar,
-.main-content {
-  @include glass-panel;
-}
-
-.sidebar {
-  border-radius: $radius-lg;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-
-  @include down('sm') {
-    padding: 18px;
-    border-radius: 24px;
-  }
-}
-
-.main-content {
-  border-radius: 36px;
-  padding: 32px;
-
-  @include down('sm') {
-    padding: 18px;
-    border-radius: 24px;
-  }
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-
-  strong {
-    display: block;
+  .brand__mark {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: linear-gradient(
+      135deg,
+      $color-accent 0%,
+      $color-accent-strong 100%
+    );
+    color: $color-white;
     font-family: $font-heading;
     font-size: 1.8rem;
-    letter-spacing: -0.03em;
   }
 
-  p {
-    margin: 0;
+  .nav {
+    display: grid;
+    gap: 10px;
+  }
+
+  .nav__link {
+    padding: 12px 14px;
+    border-radius: $radius-sm;
     color: $color-muted;
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover,
+    &--active {
+      background: $color-accent-soft;
+      color: $color-text;
+      transform: translateX(3px);
+    }
   }
-}
 
-.brand__mark {
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border-radius: 16px;
-  background: linear-gradient(135deg, $color-accent 0%, $color-accent-strong 100%);
-  color: $color-white;
-  font-family: $font-heading;
-  font-size: 1.8rem;
-}
+  .sidebar-card {
+    margin-top: auto;
+    padding: 18px;
+    border: 1px solid $color-line;
+    border-radius: $radius-md;
+    background: $color-panel-strong;
 
-.nav {
-  display: grid;
-  gap: 10px;
-}
-
-.nav__link {
-  padding: 12px 14px;
-  border-radius: $radius-sm;
-  color: $color-muted;
-  transition:
-    transform 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease;
-
-  &:hover,
-  &--active {
-    background: $color-accent-soft;
-    color: $color-text;
-    transform: translateX(3px);
+    ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: $color-muted;
+    }
   }
-}
-
-.sidebar-card {
-  margin-top: auto;
-  padding: 18px;
-  border: 1px solid $color-line;
-  border-radius: $radius-md;
-  background: $color-panel-strong;
-
-  ul {
-    margin: 12px 0 0;
-    padding-left: 18px;
-    color: $color-muted;
-  }
-}
 </style>
