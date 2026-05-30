@@ -1,5 +1,10 @@
 <script setup lang="ts">
-  import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
+  import {
+    computed,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+  } from 'vue';
   import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
   import {
     faAnglesLeft,
