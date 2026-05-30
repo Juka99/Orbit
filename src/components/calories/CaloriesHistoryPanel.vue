@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import emblaCarouselVue from 'embla-carousel-vue'
+
 import type { RecentDailyCaloriesItem } from './types'
 
 const props = defineProps<{
@@ -11,6 +13,13 @@ function formatDailyDate(dateKey: string) {
     weekday: 'short',
   }).format(new Date(year, month - 1, day))
 }
+
+const [emblaRef] = emblaCarouselVue({
+  align: 'start',
+  containScroll: 'trimSnaps',
+  dragFree: true,
+})
+void emblaRef
 </script>
 
 <template>
@@ -22,7 +31,7 @@ function formatDailyDate(dateKey: string) {
       </div>
     </div>
 
-    <div class="calories-history-panel__chart">
+    <div class="calories-history-panel__chart calories-history-panel__chart--desktop">
       <article
         v-for="day in props.recentDailyCalories"
         :key="day.dateKey"
@@ -46,15 +55,47 @@ function formatDailyDate(dateKey: string) {
         </div>
       </article>
     </div>
+
+    <div
+      ref="emblaRef"
+      class="calories-history-panel__carousel"
+    >
+      <div class="calories-history-panel__carousel-track">
+        <article
+          v-for="day in props.recentDailyCalories"
+          :key="`${day.dateKey}-mobile`"
+          class="calories-history-panel__day calories-history-panel__slide"
+          :class="{ 'calories-history-panel__day--today': day.isToday }"
+        >
+          <div class="calories-history-panel__bar-track">
+            <div
+              class="calories-history-panel__bar-fill"
+              :style="{
+                height: `${Math.min(Math.max((day.total / 2500) * 100, day.total ? 12 : 0), 100)}%`,
+              }"
+            ></div>
+          </div>
+          <div class="calories-history-panel__copy">
+            <p class="calories-history-panel__name">
+              {{ formatDailyDate(day.dateKey) }}
+            </p>
+            <strong class="calories-history-panel__value">{{ day.total }}</strong>
+            <span class="calories-history-panel__unit">kcal</span>
+          </div>
+        </article>
+      </div>
+    </div>
   </article>
 </template>
 
 <style scoped lang="scss">
 .calories-history-panel {
+  min-width: 0;
   border: 1px solid $color-line;
   border-radius: $radius-md;
   background: $color-panel-strong;
   padding: 22px;
+  overflow: hidden;
 }
 
 .calories-history-panel__header {
@@ -84,6 +125,27 @@ function formatDailyDate(dateKey: string) {
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 12px;
   justify-content: space-between;
+
+  @include down('sm') {
+    display: none;
+  }
+}
+
+.calories-history-panel__carousel {
+  display: none;
+  min-width: 0;
+  max-width: 100%;
+
+  @include down('sm') {
+    display: block;
+    overflow: hidden;
+  }
+}
+
+.calories-history-panel__carousel-track {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
 }
 
 .calories-history-panel__day {
@@ -93,6 +155,13 @@ function formatDailyDate(dateKey: string) {
   gap: 12px;
   justify-items: center;
   justify-self: center;
+}
+
+.calories-history-panel__slide {
+  flex: 0 0 92px;
+  width: 92px;
+  min-width: 92px;
+  max-width: none;
 }
 
 .calories-history-panel__bar-track {

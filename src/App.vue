@@ -6,6 +6,7 @@
     faAnglesRight,
     faDroplet,
     faGaugeHigh,
+    faListCheck,
     faNoteSticky,
     faUtensils,
   } from '@fortawesome/free-solid-svg-icons';
@@ -27,6 +28,7 @@
     {to: '/notes', label: 'Notes', icon: faNoteSticky},
     {to: '/water', label: 'Water', icon: faDroplet},
     {to: '/calories', label: 'Calories', icon: faUtensils},
+    {to: '/habits', label: 'Habits', icon: faListCheck},
   ];
 
   const accountLabel = computed(() => {
@@ -469,6 +471,16 @@
       align-items: stretch;
       justify-content: space-between;
     }
+
+    @media (max-width: 420px) {
+      gap: 6px;
+    }
+
+    @media (max-width: 420px) {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
   }
 
   .orbit-shell__nav-link {
@@ -504,6 +516,15 @@
         transform: none;
       }
     }
+
+    @media (max-width: 420px) {
+      padding: 10px 6px;
+      gap: 4px;
+    }
+
+    @media (max-width: 420px) {
+      padding: 10px 8px;
+    }
   }
 
   .orbit-shell__nav-icon {
@@ -527,6 +548,10 @@
       text-overflow: ellipsis;
       font-size: 0.75rem;
       line-height: 1.1;
+    }
+
+    @media (max-width: 420px) {
+      font-size: 0.68rem;
     }
   }
 
