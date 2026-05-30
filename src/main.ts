@@ -1,5 +1,6 @@
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
 import { createApp } from 'vue'
+import { registerSW } from 'virtual:pwa-register'
 
 import App from './App.vue'
 import { initializeAuth } from './lib/auth'
@@ -23,3 +24,7 @@ initializeAuth()
 app.use(router)
 app.use(VueQueryPlugin, { queryClient })
 app.mount('#app')
+
+registerSW({
+  immediate: true,
+})
