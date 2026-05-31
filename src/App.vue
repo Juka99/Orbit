@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import {
-    computed,
-    onBeforeUnmount,
-    onMounted,
-    ref,
-  } from 'vue';
+  import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
   import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
   import {
     faAnglesLeft,
@@ -120,15 +115,17 @@
   >
     <aside ref="sidebarRef" class="orbit-shell__sidebar">
       <div class="orbit-shell__sidebar-top">
-        <a class="orbit-shell__brand" href="/">
-          <span class="orbit-shell__brand-mark">O</span>
+        <RouterLink class="orbit-shell__brand" to="/">
+          <img
+            class="orbit-shell__brand-logo"
+            src="./assets/orbitLogoMain.png"
+            alt="Orbit Logo"
+          />
           <div class="orbit-shell__brand-copy">
             <strong class="orbit-shell__brand-title">Orbit</strong>
-            <p class="orbit-shell__brand-text">
-              Keep your essentials in check.
-            </p>
+            <p class="orbit-shell__brand-text">Keep your day in orbit.</p>
           </div>
-        </a>
+        </RouterLink>
       </div>
 
       <nav class="orbit-shell__nav">
@@ -436,32 +433,17 @@
     @include down('lg') {
       font-size: 0.92rem;
     }
-
-    @include down('sm') {
-      display: none;
-    }
   }
 
-  .orbit-shell__brand-mark {
-    width: 52px;
-    height: 52px;
-    display: grid;
-    place-items: center;
-    border-radius: 16px;
-    background: linear-gradient(
-      135deg,
-      $color-accent 0%,
-      $color-accent-strong 100%
-    );
-    color: $color-white;
-    font-family: $font-heading;
-    font-size: 1.8rem;
+  .orbit-shell__brand-logo {
+    width: 100px;
 
     @include down('lg') {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      font-size: 1.5rem;
+      width: 80px;
+    }
+
+    @media (max-width: 520px) {
+      width: 64px;
     }
   }
 
@@ -513,7 +495,7 @@
       justify-content: center;
       flex-direction: column;
       gap: 6px;
-      padding: 10px 8px;
+      padding: 16px 8px;
       border-radius: 18px;
 
       &:hover,
@@ -523,12 +505,8 @@
     }
 
     @media (max-width: 420px) {
-      padding: 10px 6px;
+      padding: 12px 8px;
       gap: 4px;
-    }
-
-    @media (max-width: 420px) {
-      padding: 10px 8px;
     }
   }
 
@@ -616,76 +594,76 @@
     }
   }
 
-@media (min-width: 1101px) {
-  .orbit-shell--collapsed {
-    .orbit-shell__sidebar {
-      padding: 24px 18px;
-      align-items: center;
-    }
+  @media (min-width: 1101px) {
+    .orbit-shell--collapsed {
+      .orbit-shell__sidebar {
+        padding: 24px 18px;
+        align-items: center;
+      }
 
-    .orbit-shell__sidebar-top {
-      width: 100%;
-      justify-content: center;
-    }
+      .orbit-shell__sidebar-top {
+        width: 100%;
+        justify-content: center;
+      }
 
-    .orbit-shell__brand {
-      width: 100%;
-      justify-content: center;
-      gap: 0;
-    }
+      .orbit-shell__brand {
+        width: 100%;
+        justify-content: center;
+        gap: 0;
+      }
 
-    .orbit-shell__brand-copy {
-      opacity: 0;
-      max-width: 0;
-      overflow: hidden;
-      transform: translateX(-8px);
-      pointer-events: none;
-    }
+      .orbit-shell__brand-copy {
+        opacity: 0;
+        max-width: 0;
+        overflow: hidden;
+        transform: translateX(-8px);
+        pointer-events: none;
+      }
 
-    .orbit-shell__nav {
-      width: 100%;
-    }
+      .orbit-shell__nav {
+        width: 100%;
+      }
 
-    .orbit-shell__nav-link {
-      justify-content: center;
-      gap: 0;
-      padding: 14px 12px;
+      .orbit-shell__nav-link {
+        justify-content: center;
+        gap: 0;
+        padding: 14px 12px;
 
-      &:hover,
-      &--active {
-        transform: translateY(-1px);
+        &:hover,
+        &--active {
+          transform: translateY(-1px);
+        }
+      }
+
+      .orbit-shell__nav-icon {
+        transform: scale(1.04);
+      }
+
+      .orbit-shell__nav-label {
+        opacity: 0;
+        max-width: 0;
+        overflow: hidden;
+        transform: translateX(-6px);
+        pointer-events: none;
+      }
+
+      .orbit-shell__stack-card {
+        width: 100%;
+        max-height: 0;
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(8px);
+        border-color: transparent;
+      }
+
+      .orbit-shell__collapse-button {
+        right: -18px;
       }
     }
-
-    .orbit-shell__nav-icon {
-      transform: scale(1.04);
-    }
-
-    .orbit-shell__nav-label {
-      opacity: 0;
-      max-width: 0;
-      overflow: hidden;
-      transform: translateX(-6px);
-      pointer-events: none;
-    }
-
-    .orbit-shell__stack-card {
-      width: 100%;
-      max-height: 0;
-      margin: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-      overflow: hidden;
-      opacity: 0;
-      transform: translateY(8px);
-      border-color: transparent;
-    }
-
-    .orbit-shell__collapse-button {
-      right: -18px;
-    }
   }
-}
 
   .orbit-shell__floating-nav {
     display: none;

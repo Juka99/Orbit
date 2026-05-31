@@ -422,13 +422,33 @@
     padding: 14px 16px;
     border: 1px solid $color-line;
     border-radius: $radius-sm;
-    background: rgba(255, 255, 255, 0.76);
+    background: rgba(255, 252, 247, 0.86);
     color: $color-text;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease;
 
     &:focus {
-      outline: 2px solid rgba(195, 123, 48, 0.14);
+      outline: none;
       border-color: rgba(195, 123, 48, 0.45);
+      background: rgba(255, 253, 249, 0.95);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.78),
+      0 0 0 3px rgba(195, 123, 48, 0.1);
     }
+  }
+
+  .entry-form__select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 48px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1.5 1.75L6 6.25L10.5 1.75' stroke='%238a5621' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 12px 8px;
   }
 
   .entry-preview {

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faCheck } from '@fortawesome/free-solid-svg-icons'
+
 import type { NotesFormState } from './types'
 
 defineProps<{
@@ -53,9 +56,16 @@ const emit = defineEmits<{
       <label class="notes-editor__toggle">
         <input
           v-model="createForm.is_pinned"
+          class="notes-editor__checkbox"
           type="checkbox"
         />
-        <span>Pin this note</span>
+        <span class="notes-editor__checkbox-shell">
+          <FontAwesomeIcon
+            class="notes-editor__checkbox-icon"
+            :icon="faCheck"
+          />
+        </span>
+        <span class="notes-editor__toggle-copy">Pin this note</span>
       </label>
 
       <button
@@ -126,20 +136,93 @@ const emit = defineEmits<{
   padding: 14px 16px;
   border: 1px solid $color-line;
   border-radius: $radius-sm;
-  background: rgba(255, 255, 255, 0.76);
+  background: rgba(255, 252, 247, 0.86);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   color: $color-text;
   resize: vertical;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
 
   &:focus {
-    outline: 2px solid rgba(13, 122, 102, 0.18);
+    outline: none;
     border-color: $color-accent;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.76),
+      0 0 0 3px rgba(13, 122, 102, 0.1);
   }
 }
 
 .notes-editor__toggle {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  color: $color-text;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.notes-editor__checkbox {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.notes-editor__checkbox-shell {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(13, 122, 102, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 252, 247, 0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    0 6px 14px rgba(61, 39, 17, 0.04);
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.notes-editor__checkbox-icon {
+  font-size: 0.7rem;
+  color: $color-white;
+  opacity: 0;
+  transform: scale(0.75);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.notes-editor__toggle:hover .notes-editor__checkbox-shell {
+  border-color: rgba(13, 122, 102, 0.32);
+  transform: translateY(-1px);
+}
+
+.notes-editor__checkbox:checked + .notes-editor__checkbox-shell {
+  border-color: rgba(13, 122, 102, 0.04);
+  background: linear-gradient(135deg, $color-accent 0%, $color-accent-strong 100%);
+  box-shadow:
+    0 8px 18px rgba(13, 122, 102, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.notes-editor__checkbox:checked + .notes-editor__checkbox-shell .notes-editor__checkbox-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.notes-editor__checkbox:focus-visible + .notes-editor__checkbox-shell {
+  outline: 2px solid rgba(13, 122, 102, 0.16);
+  outline-offset: 3px;
+}
+
+.notes-editor__toggle-copy {
   color: $color-muted;
 }
 

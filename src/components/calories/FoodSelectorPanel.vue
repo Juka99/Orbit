@@ -208,12 +208,21 @@ function handleSearchInput(event: Event) {
   padding: 14px 16px;
   border: 1px solid $color-line;
   border-radius: $radius-sm;
-  background: rgba(255, 255, 255, 0.76);
+  background: rgba(255, 252, 247, 0.86);
   color: $color-text;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 
   &:focus {
-    outline: 2px solid rgba(195, 123, 48, 0.14);
+    outline: none;
     border-color: rgba(195, 123, 48, 0.45);
+    background: rgba(255, 253, 249, 0.95);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.78),
+      0 0 0 3px rgba(195, 123, 48, 0.1);
   }
 }
 
