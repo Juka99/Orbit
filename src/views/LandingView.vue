@@ -200,7 +200,7 @@
   .landing-hero__video {
     width: 100%;
     display: block;
-    aspect-ratio: 16 / 9;
+    // aspect-ratio: 16 / 9;
     border-radius: 22px;
     // background: rgba(13, 122, 102, 0.08);
     object-fit: contain;
