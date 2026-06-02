@@ -12,6 +12,17 @@ export function formatCalendar(timestamp: string) {
   }).format(new Date(timestamp))
 }
 
+export function formatUpdatedLabel(timestamp: string) {
+  const updatedAt = new Date(timestamp)
+  const today = new Date()
+
+  if (updatedAt.toDateString() === today.toDateString()) {
+    return `Updated today at ${formatClock(timestamp)}`
+  }
+
+  return `Updated ${formatCalendar(timestamp)} at ${formatClock(timestamp)}`
+}
+
 export function formatRelativeTime(timestamp: string) {
   const diffMs = new Date(timestamp).getTime() - Date.now()
   const minuteMs = 60_000

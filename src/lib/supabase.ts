@@ -8,8 +8,9 @@ export const hasSupabaseCredentials = Boolean(supabaseUrl && supabaseAnonKey)
 export const supabase = hasSupabaseCredentials
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        detectSessionInUrl: true,
-        flowType: 'implicit',
+        detectSessionInUrl: false,
+        persistSession: true,
+        autoRefreshToken: true,
       },
     })
   : null

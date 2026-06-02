@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
 
 import { HABIT_ICON_OPTIONS, HABIT_TONE_OPTIONS, getHabitIcon, getHabitToneStyles } from './meta'
 import type { HabitFormState } from './types'
@@ -101,7 +102,11 @@ const emit = defineEmits<{
         type="submit"
         :disabled="isBusy"
       >
-        {{ isCreating ? 'Saving habit...' : 'Save habit' }}
+        <FontAwesomeIcon
+          class="habit-create__submit-icon"
+          :icon="faFloppyDisk"
+        />
+        <span>{{ isCreating ? 'Saving habit...' : 'Save habit' }}</span>
       </button>
     </form>
   </section>
@@ -117,14 +122,14 @@ const emit = defineEmits<{
   border-radius: $radius-md;
   background: $color-panel-strong;
 
-  @media (min-width: 1301px) {
+  @include above('xl') {
     @include subtle-scrollbar;
     height: 100%;
     overflow: auto;
     align-content: start;
   }
 
-  @media (max-width: 1300px) {
+  @include down('xl') {
     height: auto;
     overflow: visible;
   }
@@ -173,27 +178,11 @@ const emit = defineEmits<{
 
 .habit-create__input,
 .habit-create__textarea {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid $color-line;
-  border-radius: $radius-sm;
-  background: rgba(255, 252, 247, 0.86);
-  color: $color-text;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  resize: vertical;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  @include soft-form-control;
+}
 
-  &:focus {
-    outline: none;
-    border-color: $color-accent;
-    background: rgba(255, 253, 249, 0.95);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.78),
-      0 0 0 3px rgba(13, 122, 102, 0.1);
-  }
+.habit-create__textarea {
+  @include soft-textarea;
 }
 
 .habit-create__tone-grid,
@@ -220,6 +209,7 @@ const emit = defineEmits<{
 
 .habit-create__tone,
 .habit-create__icon-option {
+  @include tactile-button-surface;
   border: 1px solid $color-line;
   border-radius: $radius-sm;
   background: rgba(255, 255, 255, 0.74);
@@ -232,10 +222,6 @@ const emit = defineEmits<{
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  transition:
-    border-color 0.18s ease,
-    background-color 0.18s ease,
-    transform 0.18s ease;
 
   &:hover,
   &--active {
@@ -257,10 +243,6 @@ const emit = defineEmits<{
   justify-items: center;
   gap: 8px;
   padding: 14px 10px;
-  transition:
-    border-color 0.18s ease,
-    background-color 0.18s ease,
-    transform 0.18s ease;
 
   &:hover,
   &--active {
@@ -275,17 +257,22 @@ const emit = defineEmits<{
 }
 
 .habit-create__submit {
+  @include soft-accent-action-surface;
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 16px;
-  border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, $color-accent 0%, $color-accent-strong 100%);
-  color: $color-white;
   cursor: pointer;
 
   &:disabled {
     opacity: 0.65;
     cursor: wait;
   }
+}
+
+.habit-create__submit-icon {
+  font-size: 0.9rem;
 }
 </style>

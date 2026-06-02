@@ -9,7 +9,6 @@ const isInitialized = ref(false)
 const initializationError = ref('')
 
 let authInitialized = false
-let isBootstrappingSession = false
 let resolveInitialization: (() => void) | null = null
 
 const initializationPromise = new Promise<void>((resolve) => {
@@ -21,30 +20,6 @@ function markInitialized() {
   isInitialized.value = true
   resolveInitialization?.()
   resolveInitialization = null
-}
-
-async function ensureAnonymousSession() {
-  if (!supabase) {
-    return null
-  }
-
-  const {
-    data: { session: currentSession },
-  } = await supabase.auth.getSession()
-
-  if (currentSession) {
-    session.value = currentSession
-    return currentSession
-  }
-
-  const { data, error } = await supabase.auth.signInAnonymously()
-
-  if (error) {
-    throw error
-  }
-
-  session.value = data.session
-  return data.session
 }
 
 export async function ensureActiveSession() {
@@ -62,13 +37,8 @@ export async function ensureActiveSession() {
   }
 
   if (!currentSession) {
-    const restoredSession = await ensureAnonymousSession()
-
-    if (!restoredSession) {
-      throw new Error('Unable to restore the guest session.')
-    }
-
-    return restoredSession
+    session.value = null
+    throw new Error('Sign in to continue.')
   }
 
   const expiresAt = currentSession.expires_at ? currentSession.expires_at * 1000 : 0
@@ -84,13 +54,8 @@ export async function ensureActiveSession() {
   })
 
   if (error || !data.session) {
-    const restoredSession = await ensureAnonymousSession()
-
-    if (!restoredSession) {
-      throw error ?? new Error('Unable to restore the guest session.')
-    }
-
-    return restoredSession
+    session.value = null
+    throw error ?? new Error('Sign in to continue.')
   }
 
   session.value = data.session
@@ -103,51 +68,28 @@ export function initializeAuth() {
   }
 
   authInitialized = true
-  isBootstrappingSession = true
 
   if (!supabase) {
-    isBootstrappingSession = false
     markInitialized()
     return
   }
 
   void supabase.auth
     .getSession()
-    .then(async ({ data }) => {
+    .then(({ data }) => {
       session.value = data.session
-
-      if (!data.session) {
-        await ensureAnonymousSession()
-      }
-
       initializationError.value = ''
-      isBootstrappingSession = false
       markInitialized()
     })
     .catch((error) => {
       initializationError.value =
-        error instanceof Error ? error.message : 'Unable to initialize the guest session.'
-      isBootstrappingSession = false
+        error instanceof Error ? error.message : 'Unable to initialize authentication.'
       markInitialized()
     })
 
-  supabase.auth.onAuthStateChange(async (event, nextSession) => {
-    if (event === 'INITIAL_SESSION' && isBootstrappingSession) {
-      return
-    }
-
+  supabase.auth.onAuthStateChange((_event, nextSession) => {
     session.value = nextSession
-
-    if (!nextSession && event === 'SIGNED_OUT') {
-      try {
-        await ensureAnonymousSession()
-        initializationError.value = ''
-      } catch (error) {
-        initializationError.value =
-          error instanceof Error ? error.message : 'Unable to restore the guest session.'
-      }
-    }
-
+    initializationError.value = ''
     markInitialized()
   })
 }
@@ -159,18 +101,10 @@ export async function waitForAuthInitialization() {
 export function useAuth() {
   const user = computed(() => session.value?.user ?? null)
   const isAuthenticated = computed(() => Boolean(session.value?.user))
-  const isAnonymous = computed(() => {
-    if (!session.value?.user) {
-      return false
-    }
-
-    return Boolean((session.value.user as { is_anonymous?: boolean }).is_anonymous)
-  })
 
   return {
     hasSupabaseCredentials,
     isAuthenticated: readonly(isAuthenticated),
-    isAnonymous: readonly(isAnonymous),
     initializationError: readonly(initializationError),
     isInitialized: readonly(isInitialized),
     isLoading: readonly(isLoading),
@@ -179,90 +113,39 @@ export function useAuth() {
   }
 }
 
-function getAuthRedirectUrl(redirectPath?: string) {
-  const redirectUrl = new URL('/auth/callback', window.location.origin)
-
-  if (redirectPath) {
-    redirectUrl.searchParams.set('redirect', redirectPath)
-  }
-
-  return redirectUrl.toString()
-}
-
-export async function signInWithMagicLink(email: string, redirectPath?: string) {
+export async function signInWithPassword(email: string, password: string) {
   if (!supabase) {
     throw new Error('Supabase credentials are missing.')
   }
 
-  const { error } = await supabase.auth.signInWithOtp({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
-    options: {
-      emailRedirectTo: getAuthRedirectUrl(redirectPath),
-    },
+    password,
   })
 
   if (error) {
     throw error
   }
+
+  session.value = data.session
 }
 
-export async function signInWithGoogle(redirectPath?: string) {
+export async function signUpWithPassword(email: string, password: string) {
   if (!supabase) {
     throw new Error('Supabase credentials are missing.')
   }
 
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: getAuthRedirectUrl(redirectPath),
-    },
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
   })
 
   if (error) {
     throw error
   }
-}
 
-export async function completeMagicLinkSignIn() {
-  if (!supabase) {
-    throw new Error('Supabase credentials are missing.')
-  }
-
-  const currentUrl = new URL(window.location.href)
-  const authCode = currentUrl.searchParams.get('code')
-  const tokenHash = currentUrl.searchParams.get('token_hash')
-  const type = currentUrl.searchParams.get('type')
-
-  if (authCode) {
-    const { error } = await supabase.auth.exchangeCodeForSession(authCode)
-
-    if (error) {
-      throw error
-    }
-
-    return
-  }
-
-  if (tokenHash && type === 'email') {
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash,
-      type: 'email',
-    })
-
-    if (error) {
-      throw error
-    }
-
-    return
-  }
-
-  const {
-    data: { session: activeSession },
-  } = await supabase.auth.getSession()
-
-  if (!activeSession) {
-    throw new Error('This sign-in link is missing the expected authentication data.')
-  }
+  session.value = data.session
+  return data
 }
 
 export async function signOut() {
@@ -275,4 +158,6 @@ export async function signOut() {
   if (error) {
     throw error
   }
+
+  session.value = null
 }

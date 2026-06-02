@@ -49,7 +49,7 @@ defineProps<{
     justify-self: center;
   }
 
-  @media (max-width: 580px) {
+  @include down('phone') {
     justify-self: stretch;
   }
 }
@@ -84,7 +84,7 @@ defineProps<{
     width: clamp(210px, 28vw, 260px);
   }
 
-  @media (max-width: 580px) {
+  @include down('phone') {
     width: min(220px, 58vw);
     justify-self: center;
   }
@@ -144,7 +144,7 @@ defineProps<{
     max-width: 20ch;
   }
 
-  @media (max-width: 580px) {
+  @include down('phone') {
     max-width: 24ch;
   }
 }

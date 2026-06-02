@@ -7,18 +7,24 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'landing',
+      component: () => import('../views/LandingView.vue'),
+      meta: {
+        public: true,
+      },
+    },
+    {
+      path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/HomeView.vue'),
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/auth',
       name: 'auth',
       component: () => import('../views/AuthView.vue'),
-    },
-    {
-      path: '/auth/callback',
-      name: 'auth-callback',
-      component: () => import('../views/AuthCallbackView.vue'),
       meta: {
         public: true,
       },
@@ -55,6 +61,14 @@ const router = createRouter({
         requiresAuth: true,
       },
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue'),
+      meta: {
+        public: true,
+      },
+    },
   ],
 })
 
@@ -71,10 +85,15 @@ router.beforeEach(async (to) => {
     return true
   }
 
+  if (to.name === 'landing' && isAuthenticated.value) {
+    return { name: 'dashboard' }
+  }
+
   if (to.meta.requiresAuth && !isAuthenticated.value) {
     return {
       name: 'auth',
       query: {
+        mode: 'sign-in',
         redirect: to.fullPath,
       },
     }

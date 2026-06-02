@@ -62,10 +62,15 @@ defineProps<{
         :key="note.id"
         class="dashboard-notes-card__item"
       >
-        <strong class="dashboard-notes-card__item-title">
-          {{ note.title || 'Untitled note' }}
-        </strong>
-        <span class="dashboard-notes-card__item-meta">{{ note.updatedAtLabel }}</span>
+        <span class="dashboard-notes-card__item-icon">
+          <FontAwesomeIcon :icon="faNoteSticky" />
+        </span>
+        <span class="dashboard-notes-card__item-copy">
+          <strong class="dashboard-notes-card__item-title">
+            {{ note.title || 'Untitled note' }}
+          </strong>
+          <span class="dashboard-notes-card__item-meta">{{ note.updatedAtLabel }}</span>
+        </span>
       </li>
     </ul>
   </DashboardModuleCard>
@@ -133,24 +138,41 @@ defineProps<{
 }
 
 .dashboard-notes-card__item {
-  display: flex;
+  display: grid;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(89, 58, 28, 0.08);
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(195, 123, 48, 0.16);
+  border-radius: $radius-sm;
+  background: rgba(195, 123, 48, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.54);
+}
 
-  &:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-  }
+.dashboard-notes-card__item-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(195, 123, 48, 0.14);
+  color: #8a5621;
+}
+
+.dashboard-notes-card__item-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
 }
 
 .dashboard-notes-card__item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 600;
 }
 
 .dashboard-notes-card__item-meta {
-  white-space: nowrap;
+  font-size: 0.88rem;
 }
 </style>

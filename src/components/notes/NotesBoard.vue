@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faArrowsRotate, faNoteSticky } from '@fortawesome/free-solid-svg-icons'
+
 import type { Note } from '../../types/note'
 import NoteCard from './NoteCard.vue'
 import type { NotesFormState } from './types'
@@ -37,9 +40,11 @@ const emit = defineEmits<{
         class="notes-board__refresh"
         type="button"
         :disabled="isLoading || isRefreshing"
+        :aria-busy="isRefreshing"
         @click="emit('refresh')"
       >
-        {{ isRefreshing ? 'Refreshing...' : 'Refresh' }}
+        <FontAwesomeIcon :icon="faArrowsRotate" />
+        <span>{{ isRefreshing ? 'Refreshing...' : 'Refresh' }}</span>
       </button>
     </div>
 
@@ -53,9 +58,17 @@ const emit = defineEmits<{
 
       <div
         v-else-if="!hasNotes"
-        class="notes-board__state"
+        class="notes-board__state notes-board__state--empty"
       >
-        No notes yet. Your first saved note will appear here.
+        <span class="notes-board__state-icon">
+          <FontAwesomeIcon :icon="faNoteSticky" />
+        </span>
+        <span class="notes-board__state-copy">
+          <strong class="notes-board__state-title">No notes yet</strong>
+          <span class="notes-board__state-text">
+            Save your first thought from the create note section and it will appear here.
+          </span>
+        </span>
       </div>
 
       <template v-else>
@@ -138,18 +151,7 @@ const emit = defineEmits<{
 }
 
 .notes-board__refresh {
-  width: fit-content;
-  padding: 12px 16px;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(52, 37, 21, 0.08);
-  color: $color-text;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.65;
-    cursor: wait;
-  }
+  @include refresh-action-button;
 }
 
 .notes-board__content {
@@ -167,6 +169,32 @@ const emit = defineEmits<{
   border: 1px solid $color-line;
   border-radius: $radius-md;
   background: $color-panel-strong;
+}
+
+.notes-board__state--empty {
+  @include soft-empty-state(rgb(195, 123, 48));
+}
+
+.notes-board__state-icon {
+  @include soft-empty-state-icon(rgb(195, 123, 48));
+  color: #8a5621;
+}
+
+.notes-board__state-copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.notes-board__state-title {
+  font-family: $font-heading;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.notes-board__state-text {
+  color: $color-muted;
+  line-height: 1.55;
 }
 
 .notes-board__group {

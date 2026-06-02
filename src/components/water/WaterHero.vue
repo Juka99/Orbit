@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faDroplet } from '@fortawesome/free-solid-svg-icons'
+
 import type { WaterCustomFormState } from './types'
 import WaterProgressCard from './WaterProgressCard.vue'
 
@@ -89,7 +92,11 @@ const emit = defineEmits<{
             type="submit"
             :disabled="isCreating || isDeleting"
           >
-            {{ isCreating ? 'Pouring...' : 'Add custom pour' }}
+            <FontAwesomeIcon
+              class="water-hero__submit-icon"
+              :icon="faDroplet"
+            />
+            <span>{{ isCreating ? 'Pouring...' : 'Add custom pour' }}</span>
           </button>
         </form>
       </div>
@@ -133,7 +140,7 @@ const emit = defineEmits<{
     align-items: start;
   }
 
-  @media (max-width: 580px) {
+  @include down('phone') {
     grid-template-columns: 1fr;
     grid-template-areas:
       'eyebrow'
@@ -226,7 +233,7 @@ const emit = defineEmits<{
     padding-right: 8px;
   }
 
-  @media (max-width: 580px) {
+  @include down('phone') {
     max-width: none;
     padding-right: 0;
   }
@@ -248,7 +255,7 @@ const emit = defineEmits<{
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 
-  @media (min-width: 1101px) and (max-width: 1300px) {
+  @include between('lg', 'xl') {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -260,7 +267,6 @@ const emit = defineEmits<{
 
 .water-hero__quick-button,
 .water-hero__submit {
-  border: 0;
   cursor: pointer;
 
   &:disabled {
@@ -270,6 +276,7 @@ const emit = defineEmits<{
 }
 
 .water-hero__quick-button {
+  @include tactile-button-surface(rgba(13, 122, 102, 0.14), rgba(13, 122, 102, 0.18));
   padding: 18px;
   border-radius: $radius-md;
   background:
@@ -278,9 +285,6 @@ const emit = defineEmits<{
     inset 0 1px 0 rgba(255, 255, 255, 0.72),
     0 12px 26px rgba(61, 39, 17, 0.06);
   text-align: left;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -312,33 +316,20 @@ const emit = defineEmits<{
 }
 
 .water-hero__input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid $color-line;
-  border-radius: $radius-sm;
-  background: rgba(255, 252, 247, 0.86);
-  color: $color-text;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: $color-accent;
-    background: rgba(255, 253, 249, 0.95);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.78),
-      0 0 0 3px rgba(13, 122, 102, 0.1);
-  }
+  @include soft-form-control;
 }
 
 .water-hero__submit {
+  @include soft-accent-action-surface;
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 16px;
   border-radius: 999px;
-  background: linear-gradient(135deg, $color-accent 0%, $color-accent-strong 100%);
-  color: $color-white;
+}
+
+.water-hero__submit-icon {
+  font-size: 0.9rem;
 }
 </style>

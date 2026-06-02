@@ -172,7 +172,7 @@ async function handleDeleteHabit(habitId: string) {
   grid-template-rows: auto minmax(0, 1fr);
   gap: 24px;
 
-  @media (max-width: 1300px) {
+  @include down('xl') {
     @include subtle-scrollbar;
     height: 100%;
     min-height: 0;
@@ -194,7 +194,7 @@ async function handleDeleteHabit(habitId: string) {
   grid-template-columns: minmax(320px, 0.95fr) minmax(0, 1.35fr);
   gap: 20px;
 
-  @media (max-width: 1300px) {
+  @include down('xl') {
     min-height: auto;
     display: flex;
     flex-direction: column;
@@ -206,14 +206,14 @@ async function handleDeleteHabit(habitId: string) {
   min-height: 0;
   min-width: 0;
 
-  @media (max-width: 1300px) {
+  @include down('xl') {
     min-height: auto;
     flex: 0 0 auto;
   }
 }
 
 .habits-page__panel--board {
-  @media (max-width: 1300px) {
+  @include down('xl') {
     order: -1;
   }
 }

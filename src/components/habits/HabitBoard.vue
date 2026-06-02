@@ -1,4 +1,7 @@
 <script setup lang="ts">
+  import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+  import {faArrowsRotate, faListCheck} from '@fortawesome/free-solid-svg-icons';
+
   import HabitCard from './HabitCard.vue';
   import type {HabitCardViewModel, HabitFormState} from './types';
 
@@ -34,17 +37,30 @@
         class="habit-board__refresh"
         type="button"
         :disabled="isLoading || isRefreshing"
+        :aria-busy="isRefreshing"
         @click="emit('refresh')"
       >
-        {{ isRefreshing ? 'Refreshing...' : 'Refresh' }}
+        <FontAwesomeIcon :icon="faArrowsRotate" />
+        <span>{{ isRefreshing ? 'Refreshing...' : 'Refresh' }}</span>
       </button>
     </div>
 
     <div class="habit-board__content">
       <div v-if="isLoading" class="habit-board__state">Loading habits...</div>
 
-      <div v-else-if="!habits.length" class="habit-board__state">
-        No habits yet. Add one to get started on building your streaks!
+      <div
+        v-else-if="!habits.length"
+        class="habit-board__state habit-board__state--empty"
+      >
+        <span class="habit-board__state-icon">
+          <FontAwesomeIcon :icon="faListCheck" />
+        </span>
+        <span class="habit-board__state-copy">
+          <strong class="habit-board__state-title">No habits yet</strong>
+          <span class="habit-board__state-text">
+            Add your first habit and this board will start tracking streaks and daily progress.
+          </span>
+        </span>
       </div>
 
       <template v-else>
@@ -74,12 +90,12 @@
     grid-template-rows: auto minmax(0, 1fr);
     gap: 20px;
 
-    @media (min-width: 1301px) {
+    @include above('xl') {
       height: 100%;
       overflow: hidden;
     }
 
-    @media (max-width: 1300px) {
+    @include down('xl') {
       height: auto;
       overflow: visible;
       grid-template-rows: auto auto;
@@ -109,18 +125,7 @@
   }
 
   .habit-board__refresh {
-    width: fit-content;
-    padding: 12px 16px;
-    border: 0;
-    border-radius: 999px;
-    background: rgba(52, 37, 21, 0.08);
-    color: $color-text;
-    cursor: pointer;
-
-    &:disabled {
-      opacity: 0.65;
-      cursor: wait;
-    }
+    @include refresh-action-button;
   }
 
   .habit-board__content {
@@ -132,7 +137,7 @@
     gap: 16px;
     padding-right: 8px;
 
-    @media (max-width: 1300px) {
+    @include down('xl') {
       overflow: visible;
       padding-right: 0;
     }
@@ -143,5 +148,37 @@
     border: 1px solid $color-line;
     border-radius: $radius-md;
     background: $color-panel-strong;
+  }
+
+  .habit-board__state--empty {
+    @include soft-empty-state(rgb(195, 123, 48));
+    align-items: start;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .habit-board__state-icon {
+    @include soft-empty-state-icon(rgb(195, 123, 48));
+    width: 50px;
+    height: 50px;
+    color: #8a5621;
+    font-size: 1.1rem;
+  }
+
+  .habit-board__state-copy {
+    min-width: 0;
+    display: grid;
+    gap: 6px;
+  }
+
+  .habit-board__state-title {
+    font-family: $font-heading;
+    font-size: 1.25rem;
+    letter-spacing: -0.03em;
+  }
+
+  .habit-board__state-text {
+    color: $color-muted;
+    line-height: 1.55;
   }
 </style>

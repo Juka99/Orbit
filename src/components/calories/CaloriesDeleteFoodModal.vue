@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faCheck, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons'
+
 import CaloriesOverlayModal from './CaloriesOverlayModal.vue'
 
 const props = defineProps<{
@@ -29,9 +32,13 @@ const emit = defineEmits<{
         <button
           class="calories-delete-modal__close"
           type="button"
+          aria-label="Close delete food dialog"
           @click="emit('close')"
         >
-          Cancel
+          <FontAwesomeIcon
+            class="calories-delete-modal__button-icon"
+            :icon="faXmark"
+          />
         </button>
       </div>
 
@@ -47,7 +54,11 @@ const emit = defineEmits<{
             type="button"
             @click="emit('close')"
           >
-            Keep food
+            <FontAwesomeIcon
+              class="calories-confirm__button-icon"
+              :icon="faCheck"
+            />
+            <span>Keep food</span>
           </button>
           <button
             class="calories-confirm__button calories-confirm__button--danger"
@@ -55,7 +66,11 @@ const emit = defineEmits<{
             :disabled="props.isDeleting"
             @click="emit('confirm')"
           >
-            {{ props.isDeleting ? 'Removing...' : 'Delete food' }}
+            <FontAwesomeIcon
+              class="calories-confirm__button-icon"
+              :icon="faTrashCan"
+            />
+            <span>{{ props.isDeleting ? 'Removing...' : 'Delete food' }}</span>
           </button>
         </div>
       </div>
@@ -95,13 +110,16 @@ const emit = defineEmits<{
 }
 
 .calories-delete-modal__close {
-  width: fit-content;
-  padding: 12px 16px;
+  @include soft-warm-action-surface;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
   border-radius: 999px;
-  border: 0;
   cursor: pointer;
-  background: rgba(52, 37, 21, 0.08);
-  color: $color-text;
 }
 
 .calories-confirm {
@@ -126,9 +144,13 @@ const emit = defineEmits<{
 }
 
 .calories-confirm__button {
+  @include tactile-button-surface;
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 12px 16px;
-  border: 0;
   border-radius: 999px;
   cursor: pointer;
 
@@ -143,12 +165,15 @@ const emit = defineEmits<{
 }
 
 .calories-confirm__button--ghost {
-  background: rgba(52, 37, 21, 0.08);
-  color: $color-text;
+  @include soft-accent-action-surface;
 }
 
 .calories-confirm__button--danger {
-  background: linear-gradient(135deg, #9f4336 0%, #c7664f 100%);
-  color: $color-white;
+  @include soft-danger-action-surface;
+}
+
+.calories-delete-modal__button-icon,
+.calories-confirm__button-icon {
+  font-size: 0.9rem;
 }
 </style>

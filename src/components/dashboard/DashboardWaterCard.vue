@@ -158,14 +158,15 @@ defineProps<{
 .dashboard-water-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   align-items: baseline;
   height: fit-content;
 }
 
 .dashboard-water-card__tag {
-  padding: 10px 14px;
+  padding: 6px 10px;
   border-radius: 999px;
+  font-size: 0.88rem;
   background: rgba(195, 123, 48, 0.12);
   color: #8a5621;
 }

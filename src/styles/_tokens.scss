@@ -24,6 +24,10 @@ $font-heading: 'Avenir Next Condensed', 'Franklin Gothic Medium', 'Arial Narrow'
 $font-mono: 'Cascadia Code', 'Consolas', monospace;
 
 $breakpoints: (
+  '2xs': 420px,
+  'xs': 520px,
+  'phone': 580px,
   'sm': 720px,
   'lg': 1100px,
+  'xl': 1300px,
 );

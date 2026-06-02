@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faArrowsRotate, faDroplet, faTrashCan } from '@fortawesome/free-solid-svg-icons'
+
 import type { WaterLog } from '../../types/water-log'
 
 defineProps<{
@@ -35,9 +38,11 @@ function formatTimestamp(timestamp: string) {
         class="water-timeline__refresh"
         type="button"
         :disabled="isLoading || isRefreshing"
+        :aria-busy="isRefreshing"
         @click="emit('refresh')"
       >
-        {{ isRefreshing ? 'Refreshing...' : 'Refresh' }}
+        <FontAwesomeIcon :icon="faArrowsRotate" />
+        <span>{{ isRefreshing ? 'Refreshing...' : 'Refresh' }}</span>
       </button>
     </div>
 
@@ -51,9 +56,19 @@ function formatTimestamp(timestamp: string) {
 
       <div
         v-else-if="!hasTodayLogs"
-        class="water-timeline__state"
+        class="water-timeline__state water-timeline__state--empty"
       >
-        No water logged yet today. Start with one quick pour.
+        <span class="water-timeline__state-icon">
+          <FontAwesomeIcon :icon="faDroplet" />
+        </span>
+        <span class="water-timeline__state-copy">
+          <strong class="water-timeline__state-title">
+            No water logged today
+          </strong>
+          <span class="water-timeline__state-text">
+            Start with one quick pour and your timeline will begin filling in here.
+          </span>
+        </span>
       </div>
 
       <template v-else>
@@ -75,7 +90,11 @@ function formatTimestamp(timestamp: string) {
             :disabled="isDeleting || isCreating"
             @click="emit('remove', log.id)"
           >
-            Remove
+            <FontAwesomeIcon
+              class="water-log__delete-icon"
+              :icon="faTrashCan"
+            />
+            <span>Remove</span>
           </button>
         </article>
       </template>
@@ -121,20 +140,39 @@ function formatTimestamp(timestamp: string) {
   letter-spacing: -0.03em;
 }
 
-.water-timeline__refresh,
+.water-timeline__refresh {
+  @include refresh-action-button;
+}
+
 .water-log__delete {
+  @include tactile-button-surface(
+    rgba(163, 53, 53, 0.18),
+    rgba(163, 53, 53, 0.2),
+    rgba(61, 39, 17, 0.08)
+  );
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 16px;
-  border: 0;
   border-radius: 999px;
-  background: rgba(52, 37, 21, 0.08);
-  color: $color-text;
+  background: rgba(163, 53, 53, 0.1);
+  color: #8f2f2f;
   cursor: pointer;
+  @include tactile-hover-lift(
+    rgba(163, 53, 53, 0.16),
+    rgba(163, 53, 53, 0.28),
+    #7f2929
+  );
 
   &:disabled {
     opacity: 0.65;
     cursor: wait;
   }
+}
+
+.water-log__delete-icon {
+  font-size: 0.9rem;
 }
 
 .water-timeline__content {
@@ -149,6 +187,34 @@ function formatTimestamp(timestamp: string) {
 
 .water-timeline__state {
   padding: 24px;
+}
+
+.water-timeline__state--empty {
+  @include soft-empty-state;
+  border-color: rgba(13, 122, 102, 0.18);
+  background: rgba(13, 122, 102, 0.1);
+}
+
+.water-timeline__state-icon {
+  @include soft-empty-state-icon;
+  background: rgba(13, 122, 102, 0.14);
+}
+
+.water-timeline__state-copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.water-timeline__state-title {
+  font-family: $font-heading;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.water-timeline__state-text {
+  color: $color-muted;
+  line-height: 1.55;
 }
 
 .water-log {

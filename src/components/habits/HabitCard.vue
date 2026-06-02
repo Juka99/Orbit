@@ -1,7 +1,13 @@
 <script setup lang="ts">
   import {computed} from 'vue';
   import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-  import {faCheck, faPen, faTrashCan} from '@fortawesome/free-solid-svg-icons';
+  import {
+    faCheck,
+    faFloppyDisk,
+    faPen,
+    faTrashCan,
+    faXmark,
+  } from '@fortawesome/free-solid-svg-icons';
 
   import HabitWeekStrip from './HabitWeekStrip.vue';
   import {
@@ -94,7 +100,11 @@
             type="submit"
             :disabled="props.isBusy"
           >
-            {{ props.isUpdating ? 'Saving...' : 'Save changes' }}
+            <FontAwesomeIcon
+              class="habit-card__action-icon"
+              :icon="faFloppyDisk"
+            />
+            <span>{{ props.isUpdating ? 'Saving...' : 'Save changes' }}</span>
           </button>
           <button
             class="habit-card__action habit-card__action--secondary"
@@ -102,7 +112,11 @@
             :disabled="props.isBusy"
             @click="emit('cancel-editing')"
           >
-            Cancel
+            <FontAwesomeIcon
+              class="habit-card__action-icon"
+              :icon="faXmark"
+            />
+            <span>Cancel</span>
           </button>
         </div>
       </form>
@@ -166,7 +180,7 @@
           </button>
 
           <button
-            class="habit-card__action habit-card__action--secondary"
+            class="habit-card__action habit-card__action--edit"
             type="button"
             :disabled="props.isBusy"
             @click="emit('begin-editing', props.habit.id)"
@@ -317,19 +331,18 @@
   .habit-card__input,
   .habit-card__textarea,
   .habit-card__select {
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid $color-line;
-    border-radius: $radius-sm;
-    background: rgba(255, 255, 255, 0.76);
-    color: $color-text;
-    resize: vertical;
+    @include soft-form-control(
+      var(--habit-accent, $color-accent),
+      color-mix(in srgb, var(--habit-accent, $color-accent) 14%, transparent)
+    );
+  }
 
-    &:focus {
-      outline: 2px solid
-        color-mix(in srgb, var(--habit-accent, $color-accent) 18%, transparent);
-      border-color: var(--habit-accent, $color-accent);
-    }
+  .habit-card__textarea {
+    @include soft-textarea;
+  }
+
+  .habit-card__select {
+    @include soft-select;
   }
 
   .habit-card__actions {
@@ -339,12 +352,16 @@
   }
 
   .habit-card__action {
+    @include tactile-button-surface(
+      var(--habit-accent-soft, $color-line),
+      color-mix(in srgb, var(--habit-accent, $color-accent) 18%, transparent),
+      rgba(61, 39, 17, 0.08)
+    );
     width: fit-content;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 12px 16px;
-    border: 0;
     border-radius: 999px;
     cursor: pointer;
 
@@ -355,21 +372,48 @@
   }
 
   .habit-card__action--primary {
-    background: linear-gradient(
-      135deg,
-      var(--habit-accent, $color-accent) 0%,
-      var(--habit-accent-strong, $color-accent-strong) 100%
+    border-color: color-mix(
+      in srgb,
+      var(--habit-accent, $color-accent) 20%,
+      transparent
     );
-    color: $color-white;
+    background: color-mix(
+      in srgb,
+      var(--habit-accent-soft, rgba(13, 122, 102, 0.1)) 88%,
+      white
+    );
+    color: var(--habit-accent, $color-accent);
+    @include tactile-hover-lift(
+      color-mix(
+        in srgb,
+        var(--habit-accent-soft, rgba(13, 122, 102, 0.1)) 72%,
+        var(--habit-accent, $color-accent)
+      ),
+      color-mix(in srgb, var(--habit-accent, $color-accent) 32%, transparent),
+      var(--habit-accent, $color-accent)
+    );
   }
 
   .habit-card__action--secondary {
+    border-color: $color-line;
     background: rgba(52, 37, 21, 0.08);
     color: $color-text;
+    @include tactile-hover-lift(
+      rgba(52, 37, 21, 0.12),
+      rgba(52, 37, 21, 0.16),
+      $color-text
+    );
+  }
+
+  .habit-card__action--edit {
+    @include soft-warm-action-surface;
   }
 
   .habit-card__action--danger {
-    background: rgba(163, 53, 53, 0.1);
-    color: #8f2f2f;
+    @include soft-danger-action-surface;
+  }
+
+  .habit-card__action-icon {
+    font-size: 0.9rem;
   }
 </style>

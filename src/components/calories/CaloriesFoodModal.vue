@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faFloppyDisk, faXmark } from '@fortawesome/free-solid-svg-icons'
+
 import CaloriesOverlayModal from './CaloriesOverlayModal.vue'
 import type { FoodFormState, MeasureOption } from './types'
 
@@ -34,9 +37,13 @@ const emit = defineEmits<{
         <button
           class="calories-food-modal__close"
           type="button"
+          aria-label="Close food dialog"
           @click="emit('close')"
         >
-          Close
+          <FontAwesomeIcon
+            class="calories-food-modal__button-icon"
+            :icon="faXmark"
+          />
         </button>
       </div>
 
@@ -146,7 +153,11 @@ const emit = defineEmits<{
           type="submit"
           :disabled="props.isBusy"
         >
-          {{ props.submitLabel }}
+          <FontAwesomeIcon
+            class="food-form__submit-icon"
+            :icon="faFloppyDisk"
+          />
+          <span>{{ props.submitLabel }}</span>
         </button>
       </form>
     </article>
@@ -194,15 +205,20 @@ const emit = defineEmits<{
 .calories-food-modal__close,
 .food-form__submit {
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 16px;
   border-radius: 999px;
-  border: 0;
   cursor: pointer;
 }
 
 .calories-food-modal__close {
-  background: rgba(52, 37, 21, 0.08);
-  color: $color-text;
+  @include soft-warm-action-surface;
+  width: 42px;
+  height: 42px;
+  justify-content: center;
+  padding: 0;
 }
 
 .food-form {
@@ -243,35 +259,24 @@ const emit = defineEmits<{
 
 .food-form__input,
 .food-form__select {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid $color-line;
-  border-radius: $radius-sm;
-  background: rgba(255, 252, 247, 0.86);
-  color: $color-text;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  @include soft-form-control(rgba(195, 123, 48, 0.45), rgba(195, 123, 48, 0.1));
+}
 
-  &:focus {
-    outline: none;
-    border-color: rgba(195, 123, 48, 0.45);
-    background: rgba(255, 253, 249, 0.95);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.78),
-      0 0 0 3px rgba(195, 123, 48, 0.1);
-  }
+.food-form__select {
+  @include soft-select($select-chevron-amber);
 }
 
 .food-form__submit {
-  background: linear-gradient(135deg, #c37b30 0%, #d89d52 100%);
-  color: $color-white;
+  @include soft-warm-action-surface;
 
   &:disabled {
     opacity: 0.65;
     cursor: wait;
   }
+}
+
+.calories-food-modal__button-icon,
+.food-form__submit-icon {
+  font-size: 0.9rem;
 }
 </style>

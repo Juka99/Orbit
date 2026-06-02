@@ -1,5 +1,12 @@
 <script setup lang="ts">
-  import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
+  import {
+    computed,
+    nextTick,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    watch,
+  } from 'vue';
   import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
   import {
     faAnglesLeft,
@@ -8,15 +15,16 @@
     faGaugeHigh,
     faListCheck,
     faNoteSticky,
+    faRightFromBracket,
     faUtensils,
   } from '@fortawesome/free-solid-svg-icons';
-  import {RouterView, useRoute} from 'vue-router';
+  import {RouterView, useRoute, useRouter} from 'vue-router';
 
-  import {useAuth} from './lib/auth';
+  import {signOut, useAuth} from './lib/auth';
 
   const route = useRoute();
-  const {hasSupabaseCredentials, isAnonymous, isAuthenticated, user} =
-    useAuth();
+  const router = useRouter();
+  const {hasSupabaseCredentials, isAuthenticated, user} = useAuth();
   const sidebarRef = ref<HTMLElement | null>(null);
   const showFloatingNav = ref(false);
   const isDesktopSidebarCollapsed = ref(false);
@@ -24,7 +32,7 @@
   const SIDEBAR_STORAGE_KEY = 'orbit.sidebar.collapsed';
 
   const navigationItems = [
-    {to: '/', label: 'Dashboard', icon: faGaugeHigh},
+    {to: '/dashboard', label: 'Dashboard', icon: faGaugeHigh},
     {to: '/notes', label: 'Notes', icon: faNoteSticky},
     {to: '/water', label: 'Water', icon: faDroplet},
     {to: '/calories', label: 'Calories', icon: faUtensils},
@@ -32,12 +40,12 @@
   ];
 
   const accountLabel = computed(() => {
-    if (isAnonymous.value) {
-      return 'Guest session';
-    }
-
     return user.value?.email ?? '';
   });
+  const shouldShowNavigation = computed(
+    () => !hasSupabaseCredentials || isAuthenticated.value,
+  );
+  const isAuthRoute = computed(() => route.path.startsWith('/auth'));
 
   const sidebarToggleIcon = computed(() =>
     isDesktopSidebarCollapsed.value ? faAnglesRight : faAnglesLeft,
@@ -51,7 +59,28 @@
   let mobileMediaQuery: MediaQueryList | null = null;
   const handleViewportChange = () => updateFloatingNavVisibility();
 
+  function connectSidebarObserver() {
+    sidebarObserver?.disconnect();
+    sidebarObserver = null;
+
+    if (!sidebarRef.value) {
+      return;
+    }
+
+    sidebarObserver = new IntersectionObserver(updateFloatingNavVisibility, {
+      threshold: 0.3,
+      rootMargin: '-64px 0px -30% 0px',
+    });
+
+    sidebarObserver.observe(sidebarRef.value);
+  }
+
   function updateFloatingNavVisibility(entries?: IntersectionObserverEntry[]) {
+    if (!shouldShowNavigation.value) {
+      showFloatingNav.value = false;
+      return;
+    }
+
     const isCompactViewport = mobileMediaQuery?.matches ?? false;
 
     if (!isCompactViewport) {
@@ -82,6 +111,20 @@
     );
   }
 
+  async function handleSignOut() {
+    const redirectTarget =
+      route.fullPath === '/' ? '/dashboard' : route.fullPath;
+
+    await signOut();
+    await router.replace({
+      name: 'auth',
+      query: {
+        mode: 'sign-in',
+        redirect: redirectTarget,
+      },
+    });
+  }
+
   onMounted(() => {
     mobileMediaQuery = window.matchMedia('(max-width: 1100px)');
 
@@ -90,15 +133,20 @@
 
     mobileMediaQuery.addEventListener('change', handleViewportChange);
 
-    if (sidebarRef.value) {
-      sidebarObserver = new IntersectionObserver(updateFloatingNavVisibility, {
-        threshold: 0.3,
-        rootMargin: '-64px 0px -30% 0px',
-      });
+    connectSidebarObserver();
+    updateFloatingNavVisibility();
+  });
 
-      sidebarObserver.observe(sidebarRef.value);
+  watch(shouldShowNavigation, async shouldShow => {
+    if (!shouldShow) {
+      sidebarObserver?.disconnect();
+      sidebarObserver = null;
+      showFloatingNav.value = false;
+      return;
     }
 
+    await nextTick();
+    connectSidebarObserver();
     updateFloatingNavVisibility();
   });
 
@@ -111,11 +159,19 @@
 <template>
   <div
     class="orbit-shell"
-    :class="{'orbit-shell--collapsed': isDesktopSidebarCollapsed}"
+    :class="{
+      'orbit-shell--collapsed': isDesktopSidebarCollapsed,
+      'orbit-shell--auth-only': isAuthRoute && !shouldShowNavigation,
+      'orbit-shell--public-only': !isAuthRoute && !shouldShowNavigation,
+    }"
   >
-    <aside ref="sidebarRef" class="orbit-shell__sidebar">
+    <aside
+      v-if="shouldShowNavigation"
+      ref="sidebarRef"
+      class="orbit-shell__sidebar"
+    >
       <div class="orbit-shell__sidebar-top">
-        <RouterLink class="orbit-shell__brand" to="/">
+        <RouterLink class="orbit-shell__brand" to="/dashboard">
           <img
             class="orbit-shell__brand-logo"
             src="./assets/orbitLogoMain.png"
@@ -144,17 +200,24 @@
       <div class="orbit-shell__stack-card">
         <template v-if="hasSupabaseCredentials && isAuthenticated">
           <p class="orbit-shell__stack-label">Session</p>
-          <p class="orbit-shell__stack-copy">{{ accountLabel }}</p>
-          <p class="orbit-shell__stack-hint">
-            Orbit now enters through a default guest session while email sign-in
-            stays available in the codebase for later.
-          </p>
+          <p class="orbit-shell__stack-copy">Welcome, {{ accountLabel }}</p>
+          <button
+            class="orbit-shell__sign-out"
+            type="button"
+            @click="handleSignOut"
+          >
+            <FontAwesomeIcon
+              class="orbit-shell__sign-out-icon"
+              :icon="faRightFromBracket"
+            />
+            <span>Log out</span>
+          </button>
         </template>
 
         <template v-else-if="hasSupabaseCredentials">
           <p class="orbit-shell__stack-label">Session</p>
           <p class="orbit-shell__stack-copy">
-            Orbit is preparing a guest session for this browser.
+            Sign in to sync your private Orbit data.
           </p>
         </template>
 
@@ -185,7 +248,7 @@
     <main class="orbit-shell__main">
       <RouterView v-slot="{Component, route: activeRoute}">
         <Transition name="orbit-route" mode="out-in">
-          <div :key="activeRoute.fullPath" class="orbit-shell__route-stage">
+          <div :key="activeRoute.path" class="orbit-shell__route-stage">
             <component :is="Component" />
           </div>
         </Transition>
@@ -194,7 +257,7 @@
 
     <Transition name="orbit-floating-nav">
       <nav
-        v-if="showFloatingNav"
+        v-if="showFloatingNav && shouldShowNavigation"
         class="orbit-shell__floating-nav"
         aria-label="Quick navigation"
       >
@@ -232,6 +295,19 @@
       --orbit-sidebar-width: 108px;
     }
 
+    &.orbit-shell--auth-only {
+      height: 100vh;
+      min-height: 0;
+      grid-template-columns: minmax(0, 1fr);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
+    &.orbit-shell--public-only {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
     @include down('lg') {
       height: auto;
       min-height: 100vh;
@@ -243,6 +319,30 @@
     @include down('sm') {
       padding: 14px 14px 98px;
       gap: 14px;
+    }
+
+    &.orbit-shell--auth-only {
+      @include down('lg') {
+        height: 100vh;
+        min-height: 0;
+        padding: 18px;
+      }
+
+      @include down('sm') {
+        padding: 14px;
+      }
+    }
+
+    &.orbit-shell--public-only {
+      @include down('lg') {
+        padding-bottom: 18px;
+        height: 100vh;
+        display: flex;
+      }
+
+      @include down('sm') {
+        padding-bottom: 14px;
+      }
     }
   }
 
@@ -336,6 +436,13 @@
     @include down('lg') {
       padding: 20px;
     }
+  }
+
+  .orbit-shell--auth-only .orbit-shell__main {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    min-height: 0;
   }
 
   .orbit-shell__route-stage {
@@ -442,7 +549,7 @@
       width: 80px;
     }
 
-    @media (max-width: 520px) {
+    @include down('xs') {
       width: 64px;
     }
   }
@@ -459,11 +566,11 @@
       justify-content: space-between;
     }
 
-    @media (max-width: 420px) {
+    @include down('2xs') {
       gap: 6px;
     }
 
-    @media (max-width: 420px) {
+    @include down('2xs') {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
@@ -504,7 +611,7 @@
       }
     }
 
-    @media (max-width: 420px) {
+    @include down('2xs') {
       padding: 12px 8px;
       gap: 4px;
     }
@@ -533,7 +640,7 @@
       line-height: 1.1;
     }
 
-    @media (max-width: 420px) {
+    @include down('2xs') {
       font-size: 0.68rem;
     }
   }
@@ -594,7 +701,53 @@
     }
   }
 
-  @media (min-width: 1101px) {
+  .orbit-shell__sign-out {
+    width: fit-content;
+    margin-top: 14px;
+    padding: 11px 15px;
+    border: 1px solid rgba(158, 70, 47, 0.18);
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(158, 70, 47, 0.1);
+    color: #8f3428;
+    cursor: pointer;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.58),
+      0 10px 22px rgba(61, 39, 17, 0.08);
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      border-color: rgba(158, 70, 47, 0.28);
+      background: rgba(158, 70, 47, 0.16);
+      color: #7e2d24;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.64),
+        0 14px 28px rgba(61, 39, 17, 0.11);
+      transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(158, 70, 47, 0.22);
+      outline-offset: 3px;
+    }
+
+    @include down('lg') {
+      margin-top: 10px;
+    }
+  }
+
+  .orbit-shell__sign-out-icon {
+    font-size: 0.88rem;
+  }
+
+  @include above('lg') {
     .orbit-shell--collapsed {
       .orbit-shell__sidebar {
         padding: 24px 18px;

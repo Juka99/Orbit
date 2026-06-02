@@ -79,19 +79,27 @@ defineProps<{
 }
 
 .dashboard-activity-panel__link {
+  @include tactile-button-surface(rgba(13, 122, 102, 0.18), rgba(13, 122, 102, 0.22));
+  width: fit-content;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: 999px;
   background: rgba(13, 122, 102, 0.1);
   color: $color-accent;
   text-decoration: none;
   white-space: nowrap;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: rgba(13, 122, 102, 0.16);
+  }
 }
 
 .dashboard-activity-panel__link-icon {
   font-size: 0.92rem;
+  padding-right: 4px;
 }
 
 .dashboard-activity-panel__list {

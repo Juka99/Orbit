@@ -5,6 +5,7 @@
     faBolt,
     faDrumstickBite,
     faSeedling,
+    faUtensils,
     faWater,
   } from '@fortawesome/free-solid-svg-icons';
 
@@ -220,10 +221,30 @@
           type="submit"
           :disabled="props.isCreatingEntry"
         >
-          {{ props.isCreatingEntry ? 'Logging meal...' : 'Log this intake' }}
+          <FontAwesomeIcon
+            class="entry-form__submit-icon"
+            :icon="faUtensils"
+          />
+          <span>{{ props.isCreatingEntry ? 'Logging meal...' : 'Log this intake' }}</span>
         </button>
       </form>
     </template>
+
+    <div
+      v-else
+      class="selected-food-empty"
+    >
+      <span class="selected-food-empty__icon">
+        <FontAwesomeIcon :icon="faUtensils" />
+      </span>
+      <div class="selected-food-empty__copy">
+        <h3 class="selected-food-empty__title">Choose a food to log</h3>
+        <p class="selected-food-empty__text">
+          Pick an item from the food list, or add a new food, then this panel
+          will show calories, macros, amount, and meal type.
+        </p>
+      </div>
+    </div>
   </article>
 </template>
 
@@ -238,6 +259,52 @@
 
   .calories-selected-panel {
     padding: 22px;
+  }
+
+  .selected-food-empty {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid rgba(195, 123, 48, 0.16);
+    border-radius: $radius-md;
+    background: rgba(195, 123, 48, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
+
+    @include down('sm') {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .selected-food-empty__icon {
+    width: 46px;
+    height: 46px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 15px;
+    background: rgba(195, 123, 48, 0.14);
+    color: #8a5621;
+    font-size: 1.05rem;
+  }
+
+  .selected-food-empty__copy {
+    display: grid;
+    gap: 6px;
+  }
+
+  .selected-food-empty__title {
+    margin: 0;
+    font-family: $font-heading;
+    font-size: 1.25rem;
+    letter-spacing: -0.03em;
+  }
+
+  .selected-food-empty__text {
+    max-width: 56ch;
+    margin: 0;
+    color: $color-muted;
+    line-height: 1.55;
   }
 
   .calories-selected-panel__header {
@@ -418,37 +485,11 @@
 
   .entry-form__input,
   .entry-form__select {
-    width: 100%;
-    padding: 14px 16px;
-    border: 1px solid $color-line;
-    border-radius: $radius-sm;
-    background: rgba(255, 252, 247, 0.86);
-    color: $color-text;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-    transition:
-      border-color 0.2s ease,
-      box-shadow 0.2s ease,
-      background-color 0.2s ease;
-
-    &:focus {
-      outline: none;
-      border-color: rgba(195, 123, 48, 0.45);
-      background: rgba(255, 253, 249, 0.95);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.78),
-      0 0 0 3px rgba(195, 123, 48, 0.1);
-    }
+    @include soft-form-control(rgba(195, 123, 48, 0.45), rgba(195, 123, 48, 0.1));
   }
 
   .entry-form__select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    padding-right: 48px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1.5 1.75L6 6.25L10.5 1.75' stroke='%238a5621' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 18px center;
-    background-size: 12px 8px;
+    @include soft-select($select-chevron-amber);
   }
 
   .entry-preview {
@@ -465,18 +506,23 @@
   }
 
   .entry-form__submit {
+    @include soft-warm-action-surface;
     width: fit-content;
     height: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 12px 16px;
     border-radius: 999px;
-    border: 0;
     cursor: pointer;
-    background: linear-gradient(135deg, #c37b30 0%, #d89d52 100%);
-    color: $color-white;
 
     &:disabled {
       opacity: 0.65;
       cursor: wait;
     }
+  }
+
+  .entry-form__submit-icon {
+    font-size: 0.9rem;
   }
 </style>

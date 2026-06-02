@@ -1,4 +1,14 @@
 <script setup lang="ts">
+import {
+  faCheck,
+  faFloppyDisk,
+  faPen,
+  faThumbtack,
+  faTrashCan,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
 import type { Note } from '../../types/note'
 import type { NotesFormState } from './types'
 
@@ -57,9 +67,18 @@ function formatTimestamp(timestamp: string) {
         <label class="note-card__toggle">
           <input
             v-model="props.editingForm.is_pinned"
+            class="note-card__checkbox"
             type="checkbox"
           />
-          <span>{{ props.note.is_pinned ? 'Keep pinned' : 'Pin this note' }}</span>
+          <span class="note-card__checkbox-shell">
+            <FontAwesomeIcon
+              class="note-card__checkbox-icon"
+              :icon="faCheck"
+            />
+          </span>
+          <span class="note-card__toggle-copy">
+            {{ props.note.is_pinned ? 'Keep pinned' : 'Pin this note' }}
+          </span>
         </label>
         <div class="note-card__actions">
           <button
@@ -67,7 +86,11 @@ function formatTimestamp(timestamp: string) {
             type="submit"
             :disabled="props.isBusy"
           >
-            {{ props.isUpdating ? 'Saving...' : 'Save changes' }}
+            <FontAwesomeIcon
+              class="note-card__action-icon"
+              :icon="faFloppyDisk"
+            />
+            <span>{{ props.isUpdating ? 'Saving...' : 'Save changes' }}</span>
           </button>
           <button
             class="note-card__action note-card__action--secondary"
@@ -75,7 +98,11 @@ function formatTimestamp(timestamp: string) {
             :disabled="props.isBusy"
             @click="emit('cancel-editing')"
           >
-            Cancel
+            <FontAwesomeIcon
+              class="note-card__action-icon"
+              :icon="faXmark"
+            />
+            <span>Cancel</span>
           </button>
         </div>
       </form>
@@ -91,15 +118,23 @@ function formatTimestamp(timestamp: string) {
           :disabled="props.isBusy"
           @click="emit('begin-editing', props.note)"
         >
-          Edit
+          <FontAwesomeIcon
+            class="note-card__action-icon"
+            :icon="faPen"
+          />
+          <span>Edit</span>
         </button>
         <button
-          class="note-card__action note-card__action--secondary"
+          class="note-card__action note-card__action--pin"
           type="button"
           :disabled="props.isBusy"
           @click="emit('toggle-pinned', props.note)"
         >
-          {{ props.pinToggleLabel }}
+          <FontAwesomeIcon
+            class="note-card__action-icon"
+            :icon="faThumbtack"
+          />
+          <span>{{ props.pinToggleLabel }}</span>
         </button>
         <button
           class="note-card__action note-card__action--danger"
@@ -107,7 +142,11 @@ function formatTimestamp(timestamp: string) {
           :disabled="props.isBusy"
           @click="emit('delete', props.note.id)"
         >
-          Delete
+          <FontAwesomeIcon
+            class="note-card__action-icon"
+            :icon="faTrashCan"
+          />
+          <span>Delete</span>
         </button>
       </div>
     </template>
@@ -167,24 +206,37 @@ function formatTimestamp(timestamp: string) {
 
 .note-card__input,
 .note-card__textarea {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid $color-line;
-  border-radius: $radius-sm;
-  background: rgba(255, 255, 255, 0.76);
-  color: $color-text;
-  resize: vertical;
+  @include soft-form-control;
+}
 
-  &:focus {
-    outline: 2px solid rgba(13, 122, 102, 0.18);
-    border-color: $color-accent;
-  }
+.note-card__textarea {
+  @include soft-textarea;
 }
 
 .note-card__toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  @include soft-checkbox-toggle;
+}
+
+.note-card__checkbox {
+  @include soft-checkbox-input;
+}
+
+.note-card__checkbox-shell {
+  @include soft-checkbox-shell;
+}
+
+.note-card__checkbox-icon {
+  @include soft-checkbox-icon;
+}
+
+@include soft-checkbox-states(
+  '.note-card__toggle',
+  '.note-card__checkbox',
+  '.note-card__checkbox-shell',
+  '.note-card__checkbox-icon'
+);
+
+.note-card__toggle-copy {
   color: $color-muted;
 }
 
@@ -195,9 +247,12 @@ function formatTimestamp(timestamp: string) {
 }
 
 .note-card__action {
+  @include tactile-button-surface;
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 16px;
-  border: 0;
   border-radius: 999px;
   cursor: pointer;
 
@@ -208,17 +263,36 @@ function formatTimestamp(timestamp: string) {
 }
 
 .note-card__action--primary {
-  background: linear-gradient(135deg, $color-accent 0%, $color-accent-strong 100%);
-  color: $color-white;
+  @include soft-accent-action-surface;
 }
 
 .note-card__action--secondary {
+  border-color: $color-line;
   background: rgba(52, 37, 21, 0.08);
   color: $color-text;
+  @include tactile-hover-lift(
+    rgba(52, 37, 21, 0.12),
+    rgba(52, 37, 21, 0.16),
+    $color-text
+  );
+}
+
+.note-card__action--pin {
+  @include soft-warm-action-surface;
 }
 
 .note-card__action--danger {
+  border-color: rgba(163, 53, 53, 0.18);
   background: rgba(163, 53, 53, 0.1);
   color: #8f2f2f;
+  @include tactile-hover-lift(
+    rgba(163, 53, 53, 0.16),
+    rgba(163, 53, 53, 0.28),
+    #7f2929
+  );
+}
+
+.note-card__action-icon {
+  font-size: 0.9rem;
 }
 </style>

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faArrowsRotate, faTrashCan, faUtensils } from '@fortawesome/free-solid-svg-icons'
+
 import type { CalorieEntry, FoodMeasureUnit, MealType } from '../../types/calories'
 
 const props = defineProps<{
@@ -50,9 +53,11 @@ function formatTimestamp(timestamp: string) {
         class="calories-diary-panel__refresh"
         type="button"
         :disabled="props.isRefreshing"
+        :aria-busy="props.isRefreshing"
         @click="emit('refresh')"
       >
-        {{ props.isRefreshing ? 'Refreshing...' : 'Refresh' }}
+        <FontAwesomeIcon :icon="faArrowsRotate" />
+        <span>{{ props.isRefreshing ? 'Refreshing...' : 'Refresh' }}</span>
       </button>
     </div>
 
@@ -66,9 +71,19 @@ function formatTimestamp(timestamp: string) {
 
       <div
         v-else-if="!props.hasEntries"
-        class="calories-diary-panel__state"
+        class="calories-diary-panel__state calories-diary-panel__state--empty"
       >
-        No meals logged today yet. Pick a food and add your first intake.
+        <span class="calories-diary-panel__state-icon">
+          <FontAwesomeIcon :icon="faUtensils" />
+        </span>
+        <span class="calories-diary-panel__state-copy">
+          <strong class="calories-diary-panel__state-title">
+            No meals logged today
+          </strong>
+          <span class="calories-diary-panel__state-text">
+            Pick a food, choose the amount, and log your first intake for the day.
+          </span>
+        </span>
       </div>
 
       <article
@@ -144,7 +159,11 @@ function formatTimestamp(timestamp: string) {
           :disabled="props.isDeletingEntry"
           @click="emit('remove-entry', entry.id)"
         >
-          Remove
+          <FontAwesomeIcon
+            class="calories-entry-card__delete-icon"
+            :icon="faTrashCan"
+          />
+          <span>Remove</span>
         </button>
       </article>
     </div>
@@ -186,21 +205,29 @@ function formatTimestamp(timestamp: string) {
   letter-spacing: -0.03em;
 }
 
-.calories-diary-panel__refresh,
+.calories-diary-panel__refresh {
+  @include refresh-action-button;
+}
+
 .calories-entry-card__delete {
+  @include soft-danger-action-surface;
   width: fit-content;
   height: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 16px;
   border-radius: 999px;
-  border: 0;
   cursor: pointer;
-  background: rgba(52, 37, 21, 0.08);
-  color: $color-text;
 
   &:disabled {
     opacity: 0.65;
     cursor: wait;
   }
+}
+
+.calories-entry-card__delete-icon {
+  font-size: 0.9rem;
 }
 
 .calories-diary-panel__list {
@@ -214,6 +241,32 @@ function formatTimestamp(timestamp: string) {
 
 .calories-diary-panel__state {
   padding: 20px;
+}
+
+.calories-diary-panel__state--empty {
+  @include soft-empty-state(rgb(195, 123, 48));
+}
+
+.calories-diary-panel__state-icon {
+  @include soft-empty-state-icon(rgb(195, 123, 48));
+  color: #8a5621;
+}
+
+.calories-diary-panel__state-copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.calories-diary-panel__state-title {
+  font-family: $font-heading;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.calories-diary-panel__state-text {
+  color: $color-muted;
+  line-height: 1.55;
 }
 
 .calories-entry-card {

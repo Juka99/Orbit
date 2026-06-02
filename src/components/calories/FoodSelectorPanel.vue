@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons'
+import { faArrowsRotate, faCirclePlus, faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 
 import type { FoodItem, FoodMeasureUnit } from '../../types/calories'
 
@@ -49,9 +49,11 @@ function handleSearchInput(event: Event) {
         class="calories-selector__refresh"
         type="button"
         :disabled="props.isRefreshing"
+        :aria-busy="props.isRefreshing"
         @click="emit('refresh')"
       >
-        {{ props.isRefreshing ? 'Refreshing...' : 'Refresh' }}
+        <FontAwesomeIcon :icon="faArrowsRotate" />
+        <span>{{ props.isRefreshing ? 'Refreshing...' : 'Refresh' }}</span>
       </button>
     </div>
 
@@ -60,7 +62,11 @@ function handleSearchInput(event: Event) {
       type="button"
       @click="emit('add-food')"
     >
-      Add food
+      <FontAwesomeIcon
+        class="calories-selector__add-food-icon"
+        :icon="faCirclePlus"
+      />
+      <span>Add food</span>
     </button>
 
     <label class="calories-selector__search">
@@ -171,16 +177,20 @@ function handleSearchInput(event: Event) {
   letter-spacing: -0.03em;
 }
 
-.calories-selector__refresh,
+.calories-selector__refresh {
+  @include refresh-action-button;
+}
+
 .calories-selector__add-food {
+  @include soft-warm-action-surface;
   width: fit-content;
   height: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 16px;
   border-radius: 999px;
-  border: 0;
   cursor: pointer;
-  background: rgba(52, 37, 21, 0.08);
-  color: $color-text;
 
   &:disabled {
     opacity: 0.65;
@@ -190,6 +200,10 @@ function handleSearchInput(event: Event) {
 
 .calories-selector__add-food {
   margin-bottom: 18px;
+}
+
+.calories-selector__add-food-icon {
+  font-size: 0.9rem;
 }
 
 .calories-selector__search {
@@ -204,26 +218,7 @@ function handleSearchInput(event: Event) {
 }
 
 .calories-selector__search-input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid $color-line;
-  border-radius: $radius-sm;
-  background: rgba(255, 252, 247, 0.86);
-  color: $color-text;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: rgba(195, 123, 48, 0.45);
-    background: rgba(255, 253, 249, 0.95);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.78),
-      0 0 0 3px rgba(195, 123, 48, 0.1);
-  }
+  @include soft-form-control(rgba(195, 123, 48, 0.45), rgba(195, 123, 48, 0.1));
 }
 
 .calories-selector__search-input::-webkit-search-cancel-button {
@@ -286,6 +281,7 @@ function handleSearchInput(event: Event) {
 }
 
 .calories-selector__item {
+  @include tactile-button-surface($color-line, rgba(195, 123, 48, 0.18), rgba(61, 39, 17, 0.05));
   appearance: none;
   -webkit-appearance: none;
   position: relative;
@@ -297,10 +293,6 @@ function handleSearchInput(event: Event) {
   border-radius: $radius-sm;
   background: rgba(255, 255, 255, 0.5);
   cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    transform 0.2s ease;
 
   &:hover,
   .calories-selector__row--active & {
@@ -337,6 +329,7 @@ function handleSearchInput(event: Event) {
 }
 
 .calories-selector__action-button {
+  @include tactile-button-surface($color-line, rgba(195, 123, 48, 0.18), rgba(61, 39, 17, 0.06));
   width: 44px;
   height: 44px;
   min-width: 44px;
@@ -344,22 +337,12 @@ function handleSearchInput(event: Event) {
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid $color-line;
   border-radius: 14px;
   background: rgba(255, 251, 245, 0.78);
   color: $color-muted;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.62),
-    0 10px 18px rgba(61, 39, 17, 0.06);
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-
   &:hover {
     transform: translateY(-1px);
     border-color: rgba(195, 123, 48, 0.3);

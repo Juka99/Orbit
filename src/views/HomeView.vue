@@ -18,12 +18,12 @@ import { useAuth } from '../lib/auth'
 import {
   formatCalendar,
   formatClock,
-  formatRelativeTime,
+  formatUpdatedLabel,
   truncate,
 } from '../lib/dashboard'
 import { hasSupabaseCredentials } from '../lib/supabase'
 
-const { isAnonymous, isAuthenticated, user } = useAuth()
+const { isAuthenticated, user } = useAuth()
 
 const {
   isLoading: isLoadingNotes,
@@ -80,12 +80,10 @@ const authStatusBody = computed(() => {
   }
 
   if (!isAuthenticated.value) {
-    return 'Orbit is still spinning up the guest session in the background.'
+    return 'Sign in to unlock your private dashboard data.'
   }
 
-  return isAnonymous.value
-    ? 'A guest session is active, so you can keep building and testing real modules right away.'
-    : `Signed in as ${user.value?.email ?? 'your account'}, with personal data ready to flow through the app.`
+  return `Signed in as ${user.value?.email ?? 'your account'}, with personal data ready to flow through the app.`
 })
 
 const recentNotes = computed<DashboardNotePreview[]>(() => {
@@ -95,7 +93,7 @@ const recentNotes = computed<DashboardNotePreview[]>(() => {
     .map((note) => ({
       id: note.id,
       title: note.title || 'Untitled note',
-      updatedAtLabel: formatRelativeTime(note.updated_at),
+      updatedAtLabel: formatUpdatedLabel(note.updated_at),
     }))
 })
 
@@ -286,7 +284,7 @@ const moodLabel = computed(() => {
 .dashboard__module-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  @media (max-width: 1300px) {
+  @include down('xl') {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -296,7 +294,7 @@ const moodLabel = computed(() => {
 }
 
 .dashboard__module-card--calories {
-  @media (max-width: 1300px) {
+  @include down('xl') {
     grid-column: 1 / -1;
   }
 

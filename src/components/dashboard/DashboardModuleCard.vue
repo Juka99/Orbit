@@ -93,6 +93,7 @@
   }
 
   .dashboard-module-card__link {
+    @include tactile-button-surface(rgba(13, 122, 102, 0.18), rgba(13, 122, 102, 0.22));
     width: fit-content;
     display: inline-flex;
     align-items: center;
@@ -103,9 +104,6 @@
     color: $color-accent;
     text-decoration: none;
     align-self: end;
-    transition:
-      transform 180ms ease,
-      background-color 180ms ease;
 
     &:hover {
       transform: translateY(-1px);
